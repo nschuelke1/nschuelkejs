@@ -10,9 +10,26 @@
   <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.25/"></script>
 
-  <!-- Adding the modules needed for a full screen map -->
+  <!-- Adding the modules, API key, and map constant needed for a full screen map -->
   <script>  
-    require(["esri/config", "esri/Map", "esri/views/MapView"], function(esriConfig, Map, MapView) {   
+    require([
+      "esri/config", 
+      "esri/Map", 
+      "esri/views/MapView"
+    ], function(esriConfig, Map, MapView) {
+      
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurA_2jA8sPPf_DuV7jRLl5PwtnXSU0EiBd11SD4M-Bxw0LFUhsHcIudnidzb_HSatMIoBwpesb6L4zxFscSROD1-ZlJyzwi9O1g49ofMT1XgVOX_N9wT3ZGJ6jM10-6AM7-Rei3VvmlBY8MnRpbHqUSSpuogUwsrqZN8impfAnoIM0ekRJHCz_mFOlWclE1O6FrPWcbyz2RIqbKe-LUWR-fiKgANqhT82IOb4k_M01U48AT1_KdlbxgWiY";
+      const map = new Map({ 
+        basemap: "streets" // Basemap layer service 
+      }); 
+
+      const view = new MapView({
+          map: map,
+          center: [-97.7431, 30.2672], // Longitude, latitude
+          zoom: 13, // Zoom level
+          container: "viewDiv" // Div element
+        });
+
     });  
    </script>
 
