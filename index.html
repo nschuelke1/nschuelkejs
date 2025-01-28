@@ -6,21 +6,27 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="" />
 
-  <!-- calls for the arcgis api's CSS file and JS library -->
+  <!-- calls for the ArcGIS API's CSS file and JS library -->
   <link rel="stylesheet" href="https://js.arcgis.com/4.25/esri/themes/light/main.css">
   <script src="https://js.arcgis.com/4.25/"></script>
 
   <!-- Adding the modules, API key, and map constant needed for a full screen map -->
   <script>  
+
     require([
       "esri/config", 
       "esri/Map", 
-      "esri/views/MapView"
-    ], function(esriConfig, Map, MapView) {
+      "esri/views/MapView",
+      "esri/widgets/BasemapGallery",
+      "esri/widgets/Expand",
+      "esri/Basemap",
+      "esri/layers/VectorTileLayer",
+      "esri/layers/TileLayer"
+    ], function(esriConfig, Map, MapView, BasemapGallery, Expand, Basemap, VectorTileLayer, TileLayer) {
       
-      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurA_2jA8sPPf_DuV7jRLl5PwtnXSU0EiBd11SD4M-Bxw0LFUhsHcIudnidzb_HSatMIoBwpesb6L4zxFscSROD1-ZlJyzwi9O1g49ofMT1XgVOX_N9wT3ZGJ6jM10-6AM7-Rei3VvmlBY8MnRpbHqUSSpuogUwsrqZN8impfAnoIM0ekRJHCz_mFOlWclE1O6FrPWcbyz2RIqbKe-LUWR-fiKgANqhT82IOb4k_M01U48AT1_KdlbxgWiY";
+      esriConfig.apiKey = "YOUR_API_KEY_HERE";
       const map = new Map({ 
-        basemap: "navigation" // Basemap layer service 
+        basemap: "streets" // Basemap layer service 
       }); 
 
       const view = new MapView({
@@ -30,10 +36,98 @@
           container: "viewDiv" // Div element
         });
 
+      // Define ArcGIS Pro standard basemaps
+      const imagery = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            portalItem: { // autocasts as new PortalItem()
+              id: "86de37b1ebf44443b5f04f0dc8c9f51d" // World Imagery
+            }
+          })
+        ],
+        title: "Imagery",
+        id: "imagery"
+      });
+
+      const imageryHybrid = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            portalItem: { // autocasts as new PortalItem()
+              id: "83b9c27b2bf04d019a06cf71f1c181a6" // Imagery Hybrid
+            }
+          })
+        ],
+        title: "Imagery Hybrid",
+        id: "imageryHybrid"
+      });
+
+      const streets = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            portalItem: { // autocasts as new PortalItem()
+              id: "8d91bd39e873417ea21673e0fee87604" // World Street Map
+            }
+          })
+        ],
+        title: "Streets",
+        id: "streets"
+      });
+
+      const topographic = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            portalItem: { // autocasts as new PortalItem()
+              id: "0f62f2085d2e4ec2b4686df7a5e9a3a3" // World Topographic Map
+            }
+          })
+        ],
+        title: "Topographic",
+        id: "topographic"
+      });
+
+      const navigation = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            portalItem: { // autocasts as new PortalItem()
+              id: "dcbbba0edf094eaa81af19298b9c6247" // Navigation
+            }
+          })
+        ],
+        title: "Navigation",
+        id: "navigation"
+      });
+
+        //Checks for errors
+      view.when(() => {
+        basemapGallery.source.basemaps.forEach(basemap => {
+          basemap.load().then(() => {
+            console.log(basemap.title + " loaded successfully");
+          }).catch(err => {
+            console.error("Failed to load basemap: " + basemap.title, err);
+          });
+        });
+      });
+
+      // Create the BasemapGallery widget
+      const basemapGallery = new BasemapGallery({
+        view: view,
+        source: [imagery, imageryHybrid, streets, topographic, navigation] // Add ArcGIS Pro standard basemaps here
+      });
+
+      // Create an Expand widget to hold the BasemapGallery
+      const bgExpand = new Expand({
+        view: view,
+        content: basemapGallery,
+        expandIconClass: "esri-icon-basemap"
+      });
+
+      // Add the Expand widget to the top-right corner of the view
+      view.ui.add(bgExpand, "top-right");
+
     });  
    </script>
 
-  <!-- css to make a full screen app -->
+  <!-- CSS to make a full screen app -->
   <style>  
     html,  
     body,  
@@ -49,7 +143,7 @@
 
 <body>
 
-  <!-- the div to display the map -->
+  <!-- The div to display the map -->
   <div id="viewDiv"></div>  
   
 
