@@ -21,10 +21,13 @@
       "esri/widgets/Expand",
       "esri/Basemap",
       "esri/layers/VectorTileLayer",
-      "esri/layers/TileLayer"
-    ], function(esriConfig, Map, MapView, BasemapGallery, Expand, Basemap, VectorTileLayer, TileLayer) {
+      "esri/layers/TileLayer",
+      "esri/widgets/Locate",
+      "esri/widgets/Search",
+      "esri/Graphic"
+    ], function(esriConfig, Map, MapView, BasemapGallery, Expand, Basemap, VectorTileLayer, TileLayer, Locate, Search, Graphic) {
       
-      esriConfig.apiKey = "YOUR_API_KEY_HERE";
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurA_2jA8sPPf_DuV7jRLl5PwtnXSU0EiBd11SD4M-Bxw0LFUhsHcIudnidzb_HSatMIoBwpesb6L4zxFscSROD1-ZlJyzwi9O1g49ofMT1XgVOX_N9wT3ZGJ6jM10-6AM7-Rei3VvmlBY8MnRpbHqUSSpuogUwsrqZN8impfAnoIM0ekRJHCz_mFOlWclE1O6FrPWcbyz2RIqbKe-LUWR-fiKgANqhT82IOb4k_M01U48AT1_KdlbxgWiY";
       const map = new Map({ 
         basemap: "streets" // Basemap layer service 
       }); 
@@ -123,6 +126,37 @@
 
       // Add the Expand widget to the top-right corner of the view
       view.ui.add(bgExpand, "top-right");
+
+      // Add the Locate widget
+      let locateWidget = new Locate({
+        view: view,   // Attaches the Locate button to the view
+        graphic: new Graphic({
+          symbol: {
+            type: "simple-marker", // Simple marker symbol
+            style: "circle",
+            color: "blue",
+            size: "12px",
+            outline: { // Outline properties
+              color: "white",
+              width: "2px"
+            }
+          }
+        })
+      });
+
+      // Add the Locate widget to the top-left corner of the view
+      view.ui.add(locateWidget, "top-left");
+
+      // Create the Search widget
+      const searchWidget = new Search({
+        view: view
+      });
+
+      // Add the Search widget to the top-left corner of the view
+      view.ui.add(searchWidget, {
+        position: "top-left",
+        index: 0
+      });
 
     });  
    </script>
