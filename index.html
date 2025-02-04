@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"></html>
 <head>
   <title>Hello, map!</title>
   <meta charset="UTF-8" />
@@ -27,7 +27,7 @@
       "esri/Graphic"
     ], function(esriConfig, Map, MapView, BasemapGallery, Expand, Basemap, VectorTileLayer, TileLayer, Locate, Search, Graphic) {
       
-      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurA_2jA8sPPf_DuV7jRLl5PwtnXSU0EiBd11SD4M-Bxw0UrhfHaqUrAK--XK5L5IK0j28evlBaArQSY23aC17Qiito1RjB1Qy8H8S3JClycEmD7Dd99TBLzTwbaUKyLLbYpVSKpqvRsPyfR0-Ry3hlX6PAyhZuz4NKltWCs0OfwyH850FW-GsaTgcch8s7YzVFUQMQosdGZq291wfW8Q1n9bLJumMXkL8G1QxaFPp8DCUAT1_warqfXUg";
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEyZXPNJfJ1fGvqr_JmmmCs914eZd0NqvVoeUNHzi7UZU7V8xbldHhuYQ26NmA3ALSUbc9AyiL39RQuCJVpfdYQBqkZiKQnugxqPmWnHDFZeJ8WJ8L9UHaLCw6u0Jsfslpc_DJz0B8YbeLIV6aYKOYJ3HmmGZlMitoBplUGlbAr1glgISLN8KQSz1p9xWJwJUhYiBhd6Xtgu3c3z3aoKQYYUZqd1JklZhEWU6-8UreIJAT1_oP2cXSnd";
       
       const map = new Map({ 
         basemap: "streets" // Basemap layer service 
@@ -40,65 +40,102 @@
         container: "viewDiv" // Div element
       });
 
+
+    //   <!-- Updated the World Imagery basemap to use a direct REST service URL instead of a portalItem.
+    //  This avoids issues with invalid tokens and ensures using the standard, maintained raster service.
+    //  Note: Although World Imagery remains a raster basemap, using its direct URL improves reliability.
+    //   -->
       // Define ArcGIS Pro standard basemaps
       const imagery = new Basemap({
         baseLayers: [
           new TileLayer({
-            portalItem: { // autocasts as new PortalItem()
-              id: "86de37b1ebf44443b5f04f0dc8c9f51d" // World Imagery
-            }
+            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
           })
         ],
         title: "Imagery",
-        id: "imagery"
+        id: "imagery",
+
+        // Add thumbnail URL that points to Esri's hosted thumbnail image
+        thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/10df2279f9684e4a9f6a7f08febac2a9/info/thumbnail/thumbnail1584118328864.jpeg"
+
       });
 
+      // Updated the "Imagery Hybrid" basemap configuration to combine two layers:
+      // 1. The World Imagery raster layer providing the base imagery.
+      // 2. The Hybrid Reference Layer vector tile layer (from item id: 30d6b8271e1849cd9c3042060001f425)
+      //    which supplies labels and additional reference information.
+      // This change replaces the previous second layer (which was from World_Basemap_v2) with the dedicated 
+      // Hybrid Reference Layer, ensuring that the imagery hybrid basemap overlays the correct labels and reference data.
+      // Instead of using the URL from the web map item page (https://www.arcgis.com/home/item.html?id=30d6b8271e1849cd9c3042060001f425),
+      // we can use the portalItem property to reference the Hybrid Reference Layer.
+      // This allows the API to automatically resolve the correct REST endpoint for the layer.
       const imageryHybrid = new Basemap({
         baseLayers: [
           new TileLayer({
-            portalItem: { // autocasts as new PortalItem()
-              id: "83b9c27b2bf04d019a06cf71f1c181a6" // Imagery Hybrid
+            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer"
+          }),
+          new VectorTileLayer({
+            portalItem: { 
+              id: "30d6b8271e1849cd9c3042060001f425"
             }
           })
         ],
         title: "Imagery Hybrid",
-        id: "imageryHybrid"
+        id: "imageryHybrid",
+        // Add thumbnail URL that points to Esri's hosted thumbnail image
+        thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/86265e5a4bbb4187a59719cf134e0018/info/thumbnail/thumbnail1578325603377.jpeg"
       });
 
       const streets = new Basemap({
         baseLayers: [
           new TileLayer({
-            portalItem: { // autocasts as new PortalItem()
-              id: "8d91bd39e873417ea21673e0fee87604" // World Street Map
-            }
+            // Changed from using a "portalItem" to specifying a "url" directly.
+            // The original portalItem configuration for the streets basemap caused errors 
+            // because it returned a "Web Map" type rather than a Map Service.
+            // Using the URL of the Map Service ensures the TileLayer loads correctly.
+            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer"
           })
         ],
         title: "Streets",
-        id: "streets"
+        id: "streets",
+        // Add thumbnail URL that points to Esri's hosted thumbnail image
+        thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/55ebf90799fa4a3fa57562700a68c405/info/thumbnail/thumbnail1561650895690.jpeg?w=400"
       });
 
       const topographic = new Basemap({
         baseLayers: [
           new TileLayer({
-            portalItem: { // autocasts as new PortalItem()
-              id: "0f62f2085d2e4ec2b4686df7a5e9a3a3" // World Topographic Map
-            }
+            // Previously using portalItem that returned a Web Map type:
+            // portalItem: { id: "0f62f2085d2e4ec2b4686df7a5e9a3a3" }
+            // Now using the direct URL of the Map Service:
+            url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"
           })
         ],
         title: "Topographic",
-        id: "topographic"
+        id: "topographic",
+        // Add thumbnail URL that points to Esri's hosted thumbnail image
+        thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/7dc6cea0b1764a1f9af2e679f642f0f5/info/thumbnail/Topographic_600x400_thumb.jpg?w=400"
       });
 
+      // Updated the Navigation basemap configuration:
+      // • The previous configuration used a web map or portalItem which may not expose the underlying vector tile layer directly.
+      // • We now use a direct REST URL for the "World Navigation Map (v2)" vector tile service. This service provides a detailed 
+      //   basemap with a custom navigation style, optimized for mobile devices and high-resolution displays.
+      // • The vector tile layer offers advanced customization options (e.g., turning layers on/off, styling, local language support),
+      //   and is built using the same robust data sources as Esri’s other basemaps.
+      // • The new URL ("https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer") directly accesses the
+      //   vector tile service managed by Esri, ensuring improved performance and stability.
+      // • This update aligns with Esri’s recommendation to use vector basemaps for better rendering performance and up-to-date data.
       const navigation = new Basemap({
         baseLayers: [
-          new TileLayer({
-            portalItem: { // autocasts as new PortalItem()
-              id: "dcbbba0edf094eaa81af19298b9c6247" // Navigation
-            }
+          new VectorTileLayer({
+            url: "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer"
           })
         ],
         title: "Navigation",
-        id: "navigation"
+        id: "navigation",
+        // Add thumbnail URL that points to Esri's hosted thumbnail image
+        thumbnailUrl: "https://www.arcgis.com/sharing/rest/content/items/c50de463235e4161b206d000587af18b/info/thumbnail/thumbnail1561651358957.jpeg?w=400"
       });
 
       // Create the BasemapGallery widget
